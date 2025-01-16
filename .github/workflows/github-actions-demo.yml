@@ -6,7 +6,7 @@ on:
 
 jobs:
   synchronize-with-crowdin:
-    runs-on: ubuntu-22.04 # Specify the runner explicitly to ensure compatibility
+    runs-on: ubuntu-22.04 # Specify a stable runner version
 
     steps:
       - name: Checkout Code
@@ -15,15 +15,15 @@ jobs:
       - name: Crowdin Sync
         uses: crowdin/github-action@v2
         with:
-          upload_sources: true # Enable source file upload to Crowdin
-          upload_translations: false # Disable uploading translations
-          download_translations: true # Enable downloading translations
-          localization_branch_name: l10n_crowdin_translations # Name of the Crowdin localization branch
-          create_pull_request: true # Enable PR creation for updates
+          upload_sources: true
+          upload_translations: false
+          download_translations: true
+          localization_branch_name: l10n_crowdin_translations
+          create_pull_request: true
           pull_request_title: 'New Crowdin Translations'
           pull_request_body: 'New Crowdin translations by [Crowdin GH Action](https://github.com/crowdin/github-action)'
-          pull_request_base_branch_name: 'main' # Set the base branch for the PR
+          pull_request_base_branch_name: 'main'
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }} # GitHub Personal Access Token
-          CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }} # Crowdin Project ID
-          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }} # Crowdin Personal Token
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
+          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
