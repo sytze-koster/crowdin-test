@@ -23,11 +23,27 @@ jobs:
           upload_translations: true
           download_translations: true
           localization_branch_name: l18n_main
-          create_pull_request: true
-          pull_request_title: 'New Crowdin Translations'
-          pull_request_body: 'New Crowdin translations by [Crowdin GH Action](https://github.com/crowdin/github-action)'
-          pull_request_base_branch_name: 'main'
+          create_pull_request: false  # Disable automatic PR creation
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
           CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+
+      - name: Commit and Push Changes Separately
+        run: |
+          git add .
+          for file in $(git diff --name-only --cached); do
+            git add "$file"
+            git commit -m "Update translation: $file"
+          done
+          git push origin l18n_main
+
+      - name: Create Pull Request
+        uses: repo-sync/pull-request@v2
+        with:
+          source_branch: l18n_main
+          destination_branch: main
+          pr_title: 'New Crowdin Translations'
+          pr_body: 'New Crowdin translations by [Crowdin GH Action](https://github.com/crowdin/github-action)'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
