@@ -6,11 +6,15 @@ on:
 
 jobs:
   synchronize-with-crowdin:
-    runs-on: ubuntu-22.04 # Specify a stable runner version
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+
+      - name: Configure Git Authentication with PAT
+        run: |
+          git config --global url."https://${{ secrets.GH_TOKEN }}@github.com/".insteadOf "https://github.com/"
 
       - name: Crowdin Sync
         uses: crowdin/github-action@v2
