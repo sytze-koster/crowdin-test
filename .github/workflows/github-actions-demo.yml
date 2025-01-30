@@ -23,7 +23,7 @@ jobs:
           upload_translations: true
           download_translations: true
           localization_branch_name: l18n_main
-          create_pull_request: false  # Disable automatic PR creation
+          create_pull_request: true
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
@@ -31,7 +31,6 @@ jobs:
 
       - name: Commit and Push Changes Separately
         run: |
-          git fetch main
           git add .
           for file in $(git diff --name-only --cached); do
             git add "$file"
