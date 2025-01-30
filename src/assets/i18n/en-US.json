@@ -1,7 +1,8 @@
 {
   "page": {
-    "title": "Dit was nog niet goed opgeslagen"
+    "title": "Test het opslaan!"
   },
-  "title": "This title should be added",
+  "title": "Deze tekst willen we hier aanpassen",
+  "test": "Bla bla bla",
   "subtitle": "Het werkte nog niet helemaal lekker."
 }
