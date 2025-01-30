@@ -31,7 +31,6 @@ jobs:
 
       - name: Commit and Push Changes Separately
         run: |
-          git merge main
           git add .
           for file in $(git diff --name-only --cached); do
             git add "$file"
