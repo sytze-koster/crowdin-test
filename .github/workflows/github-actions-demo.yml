@@ -11,9 +11,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          persist-credentials: true
-          fetch-depth: 0  # Ensure full history for merging
 
       - name: Configure Git Authentication with PAT
         run: |
@@ -34,18 +31,12 @@ jobs:
 
       - name: Commit and Push Changes Separately
         run: |
-          git fetch origin l18n_main || git branch l18n_main
-          git checkout l18n_main
-
-          # Ensure branch is up to date to avoid conflicts
-          git reset --hard origin/l18n_main || echo "Branch does not exist remotely"
-          git merge --no-edit main
-
-          git add -A
-
-          # Commit only if there are changes
-          git diff --cached --quiet || git commit -m "Update translations"
-
+          git merge main
+          git add .
+          for file in $(git diff --name-only --cached); do
+            git add "$file"
+            git commit -m "Update translation: $file"
+          done
           git push origin l18n_main
 
       - name: Create Pull Request
@@ -57,11 +48,3 @@ jobs:
           pr_body: 'New Crowdin translations by [Crowdin GH Action](https://github.com/crowdin/github-action)'
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-
-      - name: Debug Git State (if failure occurs)
-        if: failure()
-        run: |
-          git status
-          git log --oneline -5
-          git branch -vv
-          ls -lah .git/objects
