@@ -30,8 +30,7 @@ jobs:
           CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
 
       - name: Commit and Push Changes Separately
-        run: |
-          git pull
+        run: 
           git add .
           for file in $(git diff --name-only --cached); do
             git add "$file"
