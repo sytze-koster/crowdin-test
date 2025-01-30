@@ -12,31 +12,36 @@ jobs:
   crowdin-download:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Ensure full history
+          fetch-depth: 0  # Ensure full Git history
 
-      - name: Set branch name
-        run: echo "BRANCH_NAME=l10n_crowdin_translations" >> $GITHUB_ENV
-
-      - name: Commit pre-existing changes (if any)
+      - name: Configure Git
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git add .
-          git diff --cached --quiet || git commit -m "Preemptive commit before checkout"
 
-      - name: Check if branch exists
+      - name: Commit any uncommitted changes on main
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "Committing existing changes before switching branches..."
+            git add .
+            git commit -m "Preemptive commit before branch checkout"
+            git push origin main
+          fi
+
+      - name: Check if Crowdin PR branch exists
         id: check-branch
         run: |
+          BRANCH_NAME="l10n_crowdin_translations"
           if git ls-remote --exit-code --heads origin $BRANCH_NAME; then
             echo "Branch exists, checking it out."
             git checkout $BRANCH_NAME
             git pull origin $BRANCH_NAME
             echo "EXISTING_BRANCH=true" >> $GITHUB_ENV
           else
-            echo "Branch does not exist, creating a new one."
+            echo "Branch does not exist, creating it."
             git checkout -b $BRANCH_NAME
             echo "EXISTING_BRANCH=false" >> $GITHUB_ENV
           fi
@@ -47,7 +52,7 @@ jobs:
           upload_sources: false
           upload_translations: false
           download_translations: true
-          localization_branch_name: ${{ env.BRANCH_NAME }}
+          localization_branch_name: "l10n_crowdin_translations"
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
@@ -55,17 +60,20 @@ jobs:
 
       - name: Commit new translations
         run: |
-          git add .
-          git diff --cached --quiet || git commit -m "Update translations from Crowdin"
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "Committing new Crowdin translations..."
+            git add .
+            git commit -m "Update translations from Crowdin"
+            git push origin l10n_crowdin_translations
+          else
+            echo "No new translations to commit."
+          fi
 
-      - name: Push changes
-        run: git push origin $BRANCH_NAME
-
-      - name: Create Pull Request (if not exists)
+      - name: Create Pull Request if new branch
         if: env.EXISTING_BRANCH == 'false'
         uses: peter-evans/create-pull-request@v5
         with:
-          branch: ${{ env.BRANCH_NAME }}
+          branch: "l10n_crowdin_translations"
           title: 'New Crowdin translations'
           body: 'New Crowdin pull request with translations'
           base: 'main'
