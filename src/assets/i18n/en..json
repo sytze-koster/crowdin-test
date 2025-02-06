@@ -1,8 +1,8 @@
 {
   "page": {
-    "title": "Dit is de titel van de pagina"
+    "title": "Dit is een test voor bla"
   },
-  "title": "Test kees dit is een aanpassing!",
-  "test": "Bla bla bla",
-  "subtitle": "Dit is een test om te zien hoe Crowdin werkt"
+  "title": "Nu is het echt anders",
+  "test": "zal het werken",
+  "subtitle": "Ja nu werkt het vast goed!"
 }
